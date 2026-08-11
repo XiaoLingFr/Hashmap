@@ -23,4 +23,9 @@ typedef struct Hashmap{
     void *map;
 } Hashmap;
 
-void *init(size_t size)
+void *init(size_t size);
+void reset(Hashmap *hashmap);
+
+void insert(Hashmap *hashmap, const char *str, size_t size);
+void delete(Hashmap *hashmap, const char *str, size_t size);
+void *modify(Hashmap *hashmap, const char *str, size_t size);
