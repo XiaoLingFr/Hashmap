@@ -1,5 +1,3 @@
-//hashmap.c
-
 #include "hashmap.h"
 
 size_t hashfunction(Hashmap *hashmap, const char *str, size_t size){
@@ -12,18 +10,20 @@ size_t hashfunction(Hashmap *hashmap, const char *str, size_t size){
 
 Hashmap *init(size_t size){
     Hashmap *hashmap = calloc(1, sizeof(Hashmap));
-    if(size == 1){
-        hashmap->map = calloc(SMALL, sizeof(void *));
-        hashmap->size = SMALL;
-    }
-    else{
-        if(size == 2){
-            hashmap->map = calloc(STANDARD, sizeof(void *));
-            hashmap->size = STANDARD;
+    if(hashmap != NULL){
+        if(size == 1){
+            hashmap->map = calloc(SMALL, sizeof(void *));
+            hashmap->size = SMALL;
         }
         else{
-            hashmap->map = calloc(LARGE, sizeof(void *));
-            hashmap->size = LARGE;
+            if(size == 2){
+                hashmap->map = calloc(STANDARD, sizeof(void *));
+                hashmap->size = STANDARD;
+            }
+            else{
+                hashmap->map = calloc(LARGE, sizeof(void *));
+                hashmap->size = LARGE;
+            }
         }
     }
 
@@ -50,9 +50,10 @@ void reset(Hashmap *hashmap){
     return;
 }
 
-void insert(Hashmap *hashmap, const char *str, size_t size){
+bool insert(Hashmap *hashmap, const char *str, size_t size){
     size_t loc_index = hashfunction(hashmap, str, size);
     Node *loc_current_end = (hashmap->map)[loc_index];
+    bool code = false;
 
     if(loc_current_end == NULL){
         //create node
@@ -76,16 +77,23 @@ void insert(Hashmap *hashmap, const char *str, size_t size){
                 if(loc_current_end->next == NULL){
                     //create node
                     loc_current_end->next = calloc(1, sizeof(Node));
-                    loc_current_end = loc_current_end->next;
+                    if(loc_current_end->next != NULL){
+                        loc_current_end = loc_current_end->next;
 
-                    //initialize node
-                    loc_current_end->value = calloc(size, sizeof(char));
-                    loc_current_end->value = memcpy(loc_current_end->value, str, size);
-                    loc_current_end->value_size = size;
+                        //initialize node
+                        loc_current_end->value = calloc(size, sizeof(char));
+                        if(loc_current_end->value == NULL){
+                            free(loc_current_end);
+                        }
+                        else{
+                            loc_current_end->value = memcpy(loc_current_end->value, str, size);
+                            loc_current_end->value_size = size;
 
-                    //insert
-                    loc_current_end->next = NULL;
-
+                            //insert
+                            loc_current_end->next = NULL;
+                            code = true;
+                        }
+                    }
                     //exit
                     exit = true;
                 }
@@ -97,17 +105,18 @@ void insert(Hashmap *hashmap, const char *str, size_t size){
             //if correct node
             else{
                 exit = true;
+                code = true;
             }
         }
     }
-
-    return;
+    return code;
 }
 
-void delete(Hashmap *hashmap, const char *str, size_t size){
+bool delete(Hashmap *hashmap, const char *str, size_t size){
     size_t loc_index = hashfunction(hashmap, str, size);
     Node *loc_current_end = (hashmap->map)[loc_index];
     Node *prev_current_end = NULL;
+    bool code = false;
 
     if(loc_current_end != NULL){
         bool exit = false;
@@ -129,6 +138,7 @@ void delete(Hashmap *hashmap, const char *str, size_t size){
                     free(loc_current_end);
                 }
                 exit = true;
+                code = true;
             }
             //if not the current node
             else{
@@ -143,10 +153,9 @@ void delete(Hashmap *hashmap, const char *str, size_t size){
                 }
             }
         }
-        return;
     }
     
-    return;
+    return code;
 }
 
 void *modify(Hashmap *hashmap, const char *str, size_t size){
