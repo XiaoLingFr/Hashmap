@@ -10,7 +10,7 @@ typedef struct Node{
     void *associated;
     size_t value_size;
     size_t associated_size;
-} Node;
+} Node; 
 
 enum size{
     SMALL = 32749;
