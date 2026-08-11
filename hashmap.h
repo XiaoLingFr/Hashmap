@@ -22,3 +22,5 @@ typedef struct Hashmap{
     size_t size;
     void *map;
 } Hashmap;
+
+void *init(size_t size)
