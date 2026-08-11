@@ -1,14 +1,16 @@
+//hashmap.c
+
 #include "hashmap.h"
 
 size_t hashfunction(Hashmap *hashmap, const char *str, size_t size){
     size_t hash = 0;
-    for(size_t i = 0; i < size_t; i++){
-        hash = hash*((unsigned char)(str[i])) + ((unsigned char)(str[i]));
+    for(size_t i = 0; i < size; i++){
+        hash = hash*67 + ((unsigned char)(str[i]));
     }
     return (hash%(hashmap->size));
 }
 
-void *init(size_t size){
+Hashmap *init(size_t size){
     Hashmap *hashmap = calloc(1, sizeof(Hashmap));
     if(size == 1){
         hashmap->map = calloc(SMALL, sizeof(void *));
@@ -21,7 +23,7 @@ void *init(size_t size){
         }
         else{
             hashmap->map = calloc(LARGE, sizeof(void *));
-            hashmap->map = LARGE;
+            hashmap->size = LARGE;
         }
     }
 
@@ -51,20 +53,120 @@ void insert(Hashmap *hashmap, const char *str, size_t size){
     Node *loc_current_end = (hashmap->map)[loc_index];
 
     if(loc_current_end == NULL){
-        loc_current_end = calloc(1, size_t Node);
+        //create node
+        loc_current_end = calloc(1, sizeof(Node));
         ((hashmap->map)[loc_index]) = loc_current_end;
 
+        //initialize node
+        loc_current_end->value = calloc(size, sizeof(char));
+        loc_current_end->value = memcpy(loc_current_end->value, str, size);
+        loc_current_end->value_size = size;
 
+        //insert
+        loc_current_end->next = NULL;
+    }
+    else{
+        bool exit = false;
+        while(exit == false){
+            //if this is not the correct node
+            if(memcmp(loc_current_end->value, str, size) == 0){
+                //if no continuation
+                if(loc_current_end->next == NULL){
+                    //create node
+                    loc_current_end->next = calloc(1, sizeof(Node));
+                    loc_current_end = loc_current_end->next;
+
+                    //initialize node
+                    loc_current_end->value = calloc(size, sizeof(char));
+                    loc_current_end->value = memcpy(loc_current_end->value, str, size);
+                    loc_current_end->value_size = size;
+
+                    //insert
+                    loc_current_end->next = NULL;
+
+                    //exit
+                    exit = true;
+                }
+                //continuation exists
+                else{
+                    loc_current_end = loc_current_end->next;
+                }
+            }
+            //if correct node
+            else{
+                exit = true;
+            }
+        }
     }
 
     return;
 }
 
 void delete(Hashmap *hashmap, const char *str, size_t size){
+    size_t loc_index = hashfunction(hashmap, str, size);
+    Node *loc_current_end = (hashmap->map)[loc_index];
+    Node *prev_current_end = NULL;
+
+    if(loc_current_end != NULL){
+        bool exit = false;
+        while(exit == false){
+            //if this is the correct node
+            if(memcmp(loc_current_end->value, str, size) == 0){
+                //if first node
+                if(prev_current_end == NULL){
+                    (hashmap->map)[loc_index] = loc_current_end->next;
+                    free(loc_current_end);
+                }
+                //if in middle or end
+                else{
+                    prev_current_end->next = loc_current_end->next;
+                    free(loc_current_end);
+                }
+                exit = true;
+            }
+            //if not the current node
+            else{
+                //if there is continuation
+                if(loc_current_end->next != NULL){
+                    prev_current_end = loc_current_end;
+                    loc_current_end = loc_current_end->next;
+                }
+                //if there is no continuation
+                else{
+                    exit = true;
+                }
+            }
+        }
+        return;
+    }
+    
     return;
 }
 
 void *modify(Hashmap *hashmap, const char *str, size_t size){
-    Node *loc_current_end = NULL;
+    size_t loc_index = hashfunction(hashmap, str, size);
+    Node *loc_current_end = (hashmap->map)[loc_index];
+
+    //if there is any stored in buckets
+    if(loc_current_end != NULL){
+        bool exit = false;
+        while(exit == false){
+            //if this is the correct node
+            if(memcmp(loc_current_end->value, str, size) == 0){
+                exit = true;
+            }
+            else{
+                //if continuation does not exist
+                if(loc_current_end->next == NULL){
+                    loc_current_end = NULL;
+                    exit = true;
+                }
+                //if continuation does exist
+                else{
+                    loc_current_end = loc_current_end->next;
+                }
+            }
+        }
+    }
     return loc_current_end;
 }
