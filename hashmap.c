@@ -36,6 +36,8 @@ void recursive_reset(Node *loc_current_end){
     }
     else{
         recursive_reset(loc_current_end->next);
+        free(loc_current_end->value);
+        free(loc_current_end->associated);
         free(loc_current_end);
     }
     return;
@@ -115,11 +117,15 @@ void delete(Hashmap *hashmap, const char *str, size_t size){
                 //if first node
                 if(prev_current_end == NULL){
                     (hashmap->map)[loc_index] = loc_current_end->next;
+                    free(loc_current_end->value);
+                    free(loc_current_end->associated);
                     free(loc_current_end);
                 }
                 //if in middle or end
                 else{
                     prev_current_end->next = loc_current_end->next;
+                    free(loc_current_end->value);
+                    free(loc_current_end->associated);
                     free(loc_current_end);
                 }
                 exit = true;
