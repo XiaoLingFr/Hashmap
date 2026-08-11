@@ -28,5 +28,20 @@ void *init(size_t size){
     return hashmap;
 }
 
-void insert(value){
+void recursive_reset(Node *loc_current_end){
+    if(loc_current_end == NULL){
+        return;
+    }
+    else{
+        recursive_reset(loc_current_end->next);
+        free(loc_current_end);
+    }
 }
+
+void reset(Hashmap *hashmap){
+    for(size_t i = 0; i<hashmap->size; i++){
+        recursive_reset((hashmap->map)[i]);
+    }
+}
+
+
