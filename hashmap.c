@@ -28,4 +28,5 @@ void *init(size_t size){
     return hashmap;
 }
 
-
+void insert(value){
+}
