@@ -31,21 +31,20 @@ Hashmap *init(size_t size){
 }
 
 void recursive_reset(Node *loc_current_end){
-    if(loc_current_end == NULL){
-        return;
+    if(loc_current_end->next != NULL){
+        recursive_reset(loc_current_end->next);   
     }
-    else{
-        recursive_reset(loc_current_end->next);
-        free(loc_current_end->value);
-        free(loc_current_end->associated);
-        free(loc_current_end);
-    }
+    free(loc_current_end->value);
+    free(loc_current_end->associated);
+    free(loc_current_end);
     return;
 }
 
 void reset(Hashmap *hashmap){
     for(size_t i = 0; i<hashmap->size; i++){
-        recursive_reset((hashmap->map)[i]);
+        if((hashmap->map)[i] != NULL){
+            recursive_reset((hashmap->map)[i]);
+        }
     }
     return;
 }
